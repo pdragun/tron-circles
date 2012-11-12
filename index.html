@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" >
+    <head>
+        <meta charset="utf-8">
+        <title>Tron circles</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width; initial-scale=1.0;">
+        <style type="text/css">
+            div {
+                padding: 0;
+                margin: 0;
+            }
+            #draw, #draw div {
+                background-color: transparent;
+            }
+            #draw div {
+                position: absolute;
+                top: 20px;
+
+            }
+            noscript {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tron circles</h1>
+        <p>Refresh your browser to generate new circles.</p>
+        <noscript>Please turn on Javascript or use another web browser (Firefox, Chrome, Opera/Mobile).</noscript>
+        <div id="draw"></div>
+        <script type="text/javascript">
+            //<![CDATA[
+            
+            
+            //Main init object
+            //Run at the begining
+            var MainInit = {
+                maxRadius: 0,
+                centerX: 0,
+                centerY: 0,
+                
+                init: function(){
+                    var min_circles = 3; //minimumm circles
+                    var max_circles = 10; //maximum circles
+                    var min_line_width = 5; //minimum circle line width
+                    var max_line_width = 25; //maximum circle line width
+                    var min_radius = 5; //minimal circle radius
+                    var color_scheme = [];
+                    color_scheme[0] = [];
+                    color_scheme[0][0] = '1,198,241';
+                    color_scheme[0][1] = '0,13,16';
+                    color_scheme[1] = [];
+                    color_scheme[1][0] = '3,198,190';
+                    color_scheme[1][1] = '0,7,2';
+                    color_scheme[2] = [];
+                    color_scheme[2][0] = '0,255,246';
+                    color_scheme[2][1] = '0,68,49';
+                    color_scheme[3] = [];
+                    color_scheme[3][0] = '0,254,255';
+                    color_scheme[3][1] = '0,29,39';
+                    
+                    //Check size of browser
+                    var width = window.innerWidth - 50; //Minus random value //TODO count this properly!
+                    var height = window.innerHeight - 30; //Minus random value //TODO count this properly!
+                    
+                    this.maxRadius = ((width >= height) ? height : width)/2;
+                    this.centerX = Math.round(width / 2);
+                    this.centerY = Math.round(height / 2);
+
+                    var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
+                    
+                    //Uncoment line below, if you want draw only one circle
+                    //circle_numbers = 0;
+                    for (var i = 0; i<=circle_numbers; i++ ) {
+
+                        var temp_properties = new Properties();
+                        temp_properties.number = i;
+                        temp_properties.width = width; //for all circles the same value
+                        temp_properties.height = height; //for all circles the same value
+                        
+                        temp_properties.lineWidth = Math.floor(Math.random() * max_line_width) + min_line_width;
+                        
+                        temp_properties.radius = this.findRadius(Circles.getCircles(), min_radius, this.maxRadius, temp_properties.lineWidth, 0);
+                        if(temp_properties.radius === false) continue; //can not find radius for this circle (because of collision), skip it
+                        
+                        temp_properties.startAngle = Math.round(Math.random() * 360); //random degree from 0° to 360°
+                        temp_properties.endAngle = Math.round(Math.random() * 360); //random degree from 0°to 360°
+                        temp_properties.counterclockwise = Math.round(Math.random() * 1); //random boolean 1 = true or 0 = false
+                        
+                        temp_properties.colorScheme = color_scheme[Math.round(Math.random() * 3)]; //random value from list of schemes (it is array with 4 keys (0,1,2,3))
+
+                        //rotation start
+                        temp_properties.rotation = Math.round(Math.random() * 10); //random degree 0° - 10°
+                        var rotation_direction = Math.round(Math.random() * 1)? 1: -1; //random direction 1 or -1
+                        temp_properties.rotation = rotation_direction * temp_properties.rotation; //final rotation, with degree and direction
+                        
+                        temp_properties.rotateToAngle = temp_properties.startAngle + temp_properties.rotation;
+                        if(temp_properties.rotateToAngle < 0 ) {
+                            temp_properties.rotateToAngle = 360 + temp_properties.rotateToAngle;
+                        } else if (temp_properties.rotateToAngle > 360) {
+                            temp_properties.rotateToAngle = temp_properties.rotateToAngle - 360;
+                        }
+                        //rotation end
+
+
+                        var NewCircle = new Circle(temp_properties);
+                        Circles.addCircle(NewCircle)                        
+                    }
+
+                    //Init all circles
+                    var all_circles = Circles.getCircles();
+                    for (var key in all_circles) {
+                        all_circles[key].init();
+                    }
+                },
+                findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
+                    
+                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (in future: change line_width and count again)
+                    deep++;
+                    if(deep === 10) return false;
+                    
+                    //TODO: rename this temporary variables!!
+                    var temp_circle_radius = Math.floor(Math.random() * max_radius) + min_radius;
+                    var temp_circle_min_radius_with_line = temp_circle_radius - Math.round(line_width / 2) - 1;
+                    var temp_circle_max_radius_with_line = temp_circle_radius + Math.round(line_width / 2) + 1;
+
+                    //No circle has been set yet, return radius
+                    if(all_circles.length < 1){
+                        return temp_circle_radius;
+                    }
+                    
+                    //We have already some circles, looking for possible collision
+                    var t_radius, t_radious_min, t_radious_max;
+                    for(var key in all_circles) {
+                        t_radius = all_circles[key].properties.radius
+                        t_radious_min = t_radius - Math.round(all_circles[key].properties.lineWidth / 2);
+                        t_radious_max = t_radius + Math.round(all_circles[key].properties.lineWidth / 2);
+
+                        //if true, we have collision
+                        if(   (temp_circle_max_radius_with_line >= t_radious_max && temp_circle_min_radius_with_line < t_radious_max && temp_circle_min_radius_with_line > t_radious_min)
+                            || (temp_circle_max_radius_with_line <= t_radious_max && temp_circle_max_radius_with_line >= t_radious_min && temp_circle_min_radius_with_line < t_radious_min)
+                    ){
+
+                            return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
+                        }
+
+                    }
+                    return temp_circle_radius;
+                }
+            }
+            
+            
+            //Hold basic properties for circle
+            function Properties() {
+                this.number = 0; //int, nubmer e.g. 1,2, ...13
+                this.width = 0; //int, size of browser 
+                this.height = 0; //int, size of browser 
+                this.startAngle = 0; //int, in degrees [°]
+                this.endAngle = 0;  //int, in degrees [°]
+                this.radius = 0;  //int, in pixels
+                this.lineWidth = 1;  //int, in pixels, at least 1px
+                this.rotation = 0; //int, in degrees, if negative move counterclockwise, default = 0;
+                this.rotateToAngle = 0; //int, in next draw circle, rotate to this angle, default = 0;
+                this.counterclockwise = false; //boolean, false is default (oposit of normal clockwise direction:)
+                this.colorScheme = []; //array, color scheme in RGB values, separated by comma
+            }
+            
+            
+            //Circle object
+            //Each circle will has it's own object
+            function Circle(properties){
+                this.properties = properties; //see function Properties for more info
+                this.scheme = null; //color scheme
+                this.ctx = null; //reference to Canvas context, it is set after thi.init() function is called
+            }
+            Circle.prototype.animate = function(){
+                if(this.properties.rotation === 0) return true; //no rotation by default
+
+                //clear canvas:
+                this.ctx.clearRect(0, 0, this.properties.width, this.properties.height);
+                
+                this.ctx.save();
+                this.ctx.translate(MainInit.centerX, MainInit.centerY); //move canvas to newer position
+                this.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
+                this.ctx.translate(-MainInit.centerX, -MainInit.centerY); //move canvas back, so it will be rotated around center
+ 
+                
+                //TODO code duplicity with Circle.init(), fix it, fix it
+                for (var key in this.scheme) {
+                    key = parseInt(key);
+            
+                    if( typeof(this.scheme[key+1]) == 'undefined') break;
+
+                    this.ctx.beginPath();
+                    this.ctx.lineWidth = this.properties.lineWidth;
+                    this.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
+
+                    this.ctx.arc(
+                        MainInit.centerX,
+                        MainInit.centerY,
+                        this.properties.radius,
+                        typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
+                        this.scheme[key+1]['radian'],
+                        this.properties.counterclockwise
+                    );
+
+                    this.ctx.stroke();
+                    this.ctx.closePath()
+ 
+                }
+
+                this.ctx.restore();
+                
+                //count next position //TODO there code duplicity with lines 90 - 100, fix it, fix it
+                this.properties.rotateToAngle = this.properties.rotateToAngle + this.properties.rotation;
+                if(this.properties.rotateToAngle < 0 ) {
+                    this.properties.rotateToAngle = 360 + this.properties.rotateToAngle;
+                } else if (this.properties.rotateToAngle > 360) {
+                    this.properties.rotateToAngle = this.properties.rotateToAngle - 360;
+                }
+                
+                return true;
+            }
+            Circle.prototype.setColorScheme = function(scheme){
+                this.scheme = scheme;
+                return true;
+            }
+            Circle.prototype.countColorScheme = function() {
+                
+                var all_drawable_pieces = 0;
+                //Count number of degrees between start angle and end angle
+                if (this.properties.counterclockwise === 0) { //arc is clockwise
+                    
+                    if( this.properties.startAngle > this.properties.endAngle ) { //we are going through 360°/0°
+                        var temp_degree1, temp_degree1;
+                        temp_degree1 = 360 - this.properties.startAngle;
+                        temp_degree2 = this.properties.endAngle;
+                        all_drawable_pieces = temp_degree1 + temp_degree2;
+                    } else {
+                        all_drawable_pieces = this.properties.endAngle - this.properties.startAngle;
+                    }
+                    
+                } else { //arc is anticlockwise or counterclockwise
+                    
+                    if( this.properties.startAngle > this.properties.endAngle ) {
+                        all_drawable_pieces = this.properties.startAngle - this.properties.endAngle;
+                    } else { //we are going through 360°/0°
+                        var temp_degree1, temp_degree1;
+                        temp_degree1 = this.properties.startAngle;
+                        temp_degree2 = 360 - this.properties.endAngle;
+                        all_drawable_pieces = temp_degree1 + temp_degree2;
+                    }                    
+                }
+                all_drawable_pieces = all_drawable_pieces - 1;
+                
+                var temp_scheme = [];
+                temp_scheme['begin'] = [];
+                temp_scheme['end'] = [];
+                
+                //TODO: add random choice for begin and end color - take random color from color range!
+                
+                var splited_scheme = [];
+                //set whic color will be begin and which end
+                //TODO make it shorter!!
+                if(Math.round(Math.random() * 1) === 0) {
+                    splited_scheme = this.properties.colorScheme[0].split(',');
+                    temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
+                    temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
+                    temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
+
+                    splited_scheme = this.properties.colorScheme[1].split(',');
+                    temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
+                    temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
+                    temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
+                } else {
+                    splited_scheme = this.properties.colorScheme[1].split(',');
+                    temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
+                    temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
+                    temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
+
+                    splited_scheme = this.properties.colorScheme[0].split(',');
+                    temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
+                    temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
+                    temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
+                }
+
+                
+                //alert(temp_scheme);              
+                var ratio_r = this.countColorRatioAndDirection(temp_scheme['begin']['r'], temp_scheme['end']['r'], all_drawable_pieces);
+                var ratio_g = this.countColorRatioAndDirection(temp_scheme['begin']['g'], temp_scheme['end']['g'], all_drawable_pieces);
+                var ratio_b = this.countColorRatioAndDirection(temp_scheme['begin']['b'], temp_scheme['end']['b'], all_drawable_pieces);
+
+                var color_scheme = [];
+                color_scheme[0] = [];
+                color_scheme[0]['r'] = temp_scheme['begin']['r'];
+                color_scheme[0]['g'] = temp_scheme['begin']['g'];
+                color_scheme[0]['b'] = temp_scheme['begin']['b'];
+                color_scheme[0]['radian'] = this.properties.startAngle * Math.PI / 180;
+                
+                var radian_direction = this.properties.counterclockwise === 1? -1 : 1;
+                var angle = this.properties.startAngle;
+                for (var i = 1; i <= all_drawable_pieces; i++){
+                    angle += radian_direction;
+                   
+                    color_scheme[i] = [];
+                    color_scheme[i]['r'] = Math.round(temp_scheme['begin']['r'] + (ratio_r * i));
+                    color_scheme[i]['g'] = Math.round(temp_scheme['begin']['g'] + (ratio_g * i));
+                    color_scheme[i]['b'] = Math.round(temp_scheme['begin']['b'] + (ratio_b * i));
+                   
+                    if (angle <= 0) {
+                        angle = 359;
+                    } else if (angle > 360) {
+                        angle = 1;
+                    }
+                    color_scheme[i]['radian'] = angle * Math.PI/180;
+                }
+
+                this.setColorScheme(color_scheme);
+                return true;
+            }
+            Circle.prototype.countColorRatioAndDirection = function(begin_color, end_color, degrees){
+                
+                var ratio = Math.abs(begin_color - end_color) / degrees;
+                return begin_color >= end_color ? ratio * -1 : ratio;
+                
+            }
+            Circle.prototype.init = function(){
+                
+                this.countColorScheme();
+                
+                
+                var canvas_div = document.createElement('div');
+                //canvas_div.setAttribute('id', 'draw'+this.properties.number);
+                
+                var canvas_html = '<canvas id=\"playground_canvas'+this.properties.number+'\" width=\"'+this.properties.width+'\" height=\"'+this.properties.height+'\"><\/canvas>';
+                canvas_div.innerHTML = canvas_html;
+                
+                document.getElementById('draw').appendChild(canvas_div);
+                
+                var canvas = document.getElementById('playground_canvas'+this.properties.number);
+                this.ctx = canvas.getContext('2d');
+                
+                for (var key in this.scheme) {
+                    key = parseInt(key);
+            
+                    if( typeof(this.scheme[key+1]) == 'undefined') break;
+
+                    // draw a sector
+                    this.ctx.beginPath();
+                    this.ctx.arc(
+                        MainInit.centerX,
+                        MainInit.centerY,
+                        this.properties.radius,
+                        typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
+                        this.scheme[key+1]['radian'],
+                        this.properties.counterclockwise
+                    );
+                    
+                    this.ctx.closePath();
+
+                    //stroke a sector
+                    this.ctx.lineWidth = this.properties.lineWidth;
+                    this.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
+                    this.ctx.stroke();
+
+                }
+                
+            }
+            
+            
+            //Hold reference to all Circle objects
+            var Circles = {
+                circles_collection: [],
+                //collect all circle objects in array, insert circle object
+                addCircle: function(circle){
+                    this.circles_collection.push(circle);
+                    return true;
+                },
+                //return all existing circle objects in array
+                getCircles: function(){
+                    return this.circles_collection;
+                }
+            }
+            
+            //if possible use requestAnimationFrame, otherwise use timeout
+            window.requestAnimFrame = (function(callback) {
+                return window.requestAnimationFrame || 
+                    window.webkitRequestAnimationFrame || 
+                    window.mozRequestAnimationFrame || 
+                    window.oRequestAnimationFrame || 
+                    window.msRequestAnimationFrame ||
+                    function(callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+            })();
+            
+            
+            //Init
+            MainInit.init();
+            
+            //run animations
+            (function animloop(){
+                requestAnimFrame(animloop);
+                var all_circles = Circles.getCircles();
+                for (var key in all_circles) {
+                    all_circles[key].animate();
+                }   
+            })();
+            //]]>
+        </script>
+    </body>
+</html>
