@@ -101,7 +101,7 @@
                         temp_properties.colorScheme = color_scheme[Math.round(Math.random() * 3)]; //random value from list of schemes (it is array with 4 keys (0,1,2,3))
 
                         //rotation start
-                        temp_properties.rotation = Math.round(Math.random() * 10); //random degree 0° - 10°
+                        temp_properties.rotation = Math.round(Math.random() * 10) + 1; //random degree 1° - 10°
                         var rotation_direction = Math.round(Math.random() * 1)? 1: -1; //random direction 1 or -1
                         temp_properties.rotation = rotation_direction * temp_properties.rotation; //final rotation, with degree and direction
                         
