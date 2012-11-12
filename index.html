@@ -26,7 +26,7 @@
             }
             #draw div {
                 position: absolute;
-                top: 20px;
+                top: 90px;
 
             }
             noscript {
@@ -71,10 +71,10 @@
                     color_scheme[3][1] = '0,29,39';
                     
                     //Check size of browser
-                    var width = window.innerWidth - 50; //Minus random value //TODO count this properly!
-                    var height = window.innerHeight - 30; //Minus random value //TODO count this properly!
+                    var width = window.innerWidth - 70; //Minus random value //TODO count this properly!
+                    var height = window.innerHeight - 100; //Minus random value //TODO count this properly!
                     
-                    this.maxRadius = ((width >= height) ? height : width)/2;
+                    this.maxRadius = width >= height ? height/2 : width/2;
                     this.centerX = Math.round(width / 2);
                     this.centerY = Math.round(height / 2);
 
