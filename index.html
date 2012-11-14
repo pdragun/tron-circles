@@ -38,6 +38,7 @@
     <body>
         <h1>Tron circles</h1>
         <p>Refresh your browser to generate new circles.</p>
+        <p>FPS: <span id="fps"></span></p>
         <noscript>Please turn on Javascript or use another web browser (Firefox, Chrome, Opera/Mobile).</noscript>
         <div id="draw"></div>
         <script type="text/javascript">
@@ -394,6 +395,17 @@
                 }
             }
             
+            //Statistics
+            //inspired with: http://active.tutsplus.com/tutorials/animation/html5-canvas-optimization-a-practical-example/
+            //TODO rewrite this quick & dirty solution
+            var frameCount = 0;
+            var logs = document.getElementById('fps');
+            function getStats(){
+                logs.innerHTML = frameCount;
+                frameCount = 0;
+                setTimeout( getStats, 1000 );
+            }
+            
             //if possible use requestAnimationFrame, otherwise use timeout
             //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
             window.requestAnimFrame = (function(callback) {
@@ -415,14 +427,19 @@
             (function animloop(){
                 requestAnimFrame(animloop);
                 
+                frameCount++; //for statistics
+                
                 //clear canvas:
                 Circles.ctx.clearRect(0, 0, Circles.width, Circles.height);
                 
                 var all_circles = Circles.getCircles();
                 for (var key in all_circles) {
                     all_circles[key].animate();
-                }   
+                }
             })();
+            
+            //run statistics:
+            getStats();
             //]]>
         </script>
     </body>
