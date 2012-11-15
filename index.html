@@ -228,8 +228,7 @@
 
                     Circles.ctx.beginPath();
                     Circles.ctx.lineWidth = this.properties.lineWidth;
-                    Circles.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
-
+                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.arc(
                         MainInit.centerX,
                         MainInit.centerY,
@@ -327,9 +326,7 @@
 
                 var color_scheme = [];
                 color_scheme[0] = [];
-                color_scheme[0]['r'] = temp_scheme['begin']['r'];
-                color_scheme[0]['g'] = temp_scheme['begin']['g'];
-                color_scheme[0]['b'] = temp_scheme['begin']['b'];
+                color_scheme[0]['rgb'] = 'rgb('+temp_scheme['begin']['r']+','+temp_scheme['begin']['g']+','+temp_scheme['begin']['b']+')';
                 color_scheme[0]['radian'] = this.properties.startAngle * Math.PI / 180;
                 
                 var radian_direction = this.properties.counterclockwise === 1? -1 : 1;
@@ -338,9 +335,9 @@
                     angle += radian_direction;
                    
                     color_scheme[i] = [];
-                    color_scheme[i]['r'] = Math.round(temp_scheme['begin']['r'] + (ratio_r * i));
-                    color_scheme[i]['g'] = Math.round(temp_scheme['begin']['g'] + (ratio_g * i));
-                    color_scheme[i]['b'] = Math.round(temp_scheme['begin']['b'] + (ratio_b * i));
+                    color_scheme[i]['rgb']  = 'rgb('+ Math.round(temp_scheme['begin']['r'] + (ratio_r * i))+','+
+                                            +Math.round(temp_scheme['begin']['g'] + (ratio_g * i))+','+
+                                            +Math.round(temp_scheme['begin']['b'] + (ratio_b * i))+')';
                    
                     if (angle <= 0) {
                         angle = 359;
@@ -383,7 +380,7 @@
 
                     //stroke a sector
                     Circles.ctx.lineWidth = this.properties.lineWidth;
-                    Circles.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
+                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.stroke();
 
                 }
