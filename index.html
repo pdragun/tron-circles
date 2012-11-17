@@ -43,7 +43,35 @@
         <div id="draw"></div>
         <script type="text/javascript">
             //<![CDATA[
-            
+
+            // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+            // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+            // requestAnimationFrame polyfill by Erik Möller
+            // fixes from Paul Irish and Tino Zijdel
+            (function() {
+                var lastTime = 0;
+                var vendors = ['ms', 'moz', 'webkit', 'o'];
+                for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+                    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                        || window[vendors[x]+'CancelRequestAnimationFrame'];
+                }
+ 
+                if (!window.requestAnimationFrame)
+                    window.requestAnimationFrame = function(callback, element) {
+                        var currTime = new Date().getTime();
+                        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                        var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+                        timeToCall);
+                        lastTime = currTime + timeToCall;
+                        return id;
+                    };
+ 
+                if (!window.cancelAnimationFrame)
+                    window.cancelAnimationFrame = function(id) {
+                        clearTimeout(id);
+                    };
+            }());            
             
             //Main init object
             //Run at the begining
@@ -171,7 +199,7 @@
                 this.endAngle = 0;  //int, in degrees [°]
                 this.radius = 0;  //int, in pixels
                 this.lineWidth = 1;  //int, in pixels, at least 1px
-                this.rotation = 0; //int, in degrees, if negative move counterclockwise, default = 0;
+                this.rotation = 1; //int, in degrees, if negative move counterclockwise, default = 1;
                 this.rotateToAngle = 0; //int, in next draw circle, rotate to this angle, default = 0;
                 this.counterclockwise = false; //boolean, false is default (oposit of normal clockwise direction:)
                 this.colorScheme = []; //array, color scheme in RGB values, separated by comma
@@ -185,7 +213,6 @@
                 this.scheme = null; //color scheme
             }
             Circle.prototype.animate = function(){
-                if(this.properties.rotation === 0) return true; //no rotation by default
 
                 Circles.ctx.save();
                 Circles.ctx.translate(MainInit.centerX, MainInit.centerY); //move canvas to newer position
@@ -201,8 +228,7 @@
 
                     Circles.ctx.beginPath();
                     Circles.ctx.lineWidth = this.properties.lineWidth;
-                    Circles.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
-
+                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.arc(
                         MainInit.centerX,
                         MainInit.centerY,
@@ -253,7 +279,7 @@
                     if( this.properties.startAngle > this.properties.endAngle ) {
                         all_drawable_pieces = this.properties.startAngle - this.properties.endAngle;
                     } else { //we are going through 360°/0°
-                        var temp_degree1, temp_degree1;
+                        var temp_degree1, temp_degree2;
                         temp_degree1 = this.properties.startAngle;
                         temp_degree2 = 360 - this.properties.endAngle;
                         all_drawable_pieces = temp_degree1 + temp_degree2;
@@ -292,17 +318,13 @@
                     temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
                 }
 
-                
-                //alert(temp_scheme);              
                 var ratio_r = this.countColorRatioAndDirection(temp_scheme['begin']['r'], temp_scheme['end']['r'], all_drawable_pieces);
                 var ratio_g = this.countColorRatioAndDirection(temp_scheme['begin']['g'], temp_scheme['end']['g'], all_drawable_pieces);
                 var ratio_b = this.countColorRatioAndDirection(temp_scheme['begin']['b'], temp_scheme['end']['b'], all_drawable_pieces);
 
                 var color_scheme = [];
                 color_scheme[0] = [];
-                color_scheme[0]['r'] = temp_scheme['begin']['r'];
-                color_scheme[0]['g'] = temp_scheme['begin']['g'];
-                color_scheme[0]['b'] = temp_scheme['begin']['b'];
+                color_scheme[0]['rgb'] = 'rgb('+temp_scheme['begin']['r']+','+temp_scheme['begin']['g']+','+temp_scheme['begin']['b']+')';
                 color_scheme[0]['radian'] = this.properties.startAngle * Math.PI / 180;
                 
                 var radian_direction = this.properties.counterclockwise === 1? -1 : 1;
@@ -311,9 +333,9 @@
                     angle += radian_direction;
                    
                     color_scheme[i] = [];
-                    color_scheme[i]['r'] = Math.round(temp_scheme['begin']['r'] + (ratio_r * i));
-                    color_scheme[i]['g'] = Math.round(temp_scheme['begin']['g'] + (ratio_g * i));
-                    color_scheme[i]['b'] = Math.round(temp_scheme['begin']['b'] + (ratio_b * i));
+                    color_scheme[i]['rgb']  = 'rgb('+ Math.round(temp_scheme['begin']['r'] + (ratio_r * i))+','+
+                                            +Math.round(temp_scheme['begin']['g'] + (ratio_g * i))+','+
+                                            +Math.round(temp_scheme['begin']['b'] + (ratio_b * i))+')';
                    
                     if (angle <= 0) {
                         angle = 359;
@@ -356,11 +378,9 @@
 
                     //stroke a sector
                     Circles.ctx.lineWidth = this.properties.lineWidth;
-                    Circles.ctx.strokeStyle = 'rgb('+this.scheme[key]['r']+','+this.scheme[key]['g']+','+this.scheme[key]['b']+')';
+                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.stroke();
-
                 }
-                
             }
             
             
@@ -406,27 +426,12 @@
                 setTimeout( getStats, 1000 );
             }
             
-            //if possible use requestAnimationFrame, otherwise use timeout
-            //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-            window.requestAnimFrame = (function(callback) {
-                return window.requestAnimationFrame || 
-                    window.webkitRequestAnimationFrame || 
-                    window.mozRequestAnimationFrame || 
-                    window.oRequestAnimationFrame || 
-                    window.msRequestAnimationFrame ||
-                    function(callback) {
-                    window.setTimeout(callback, 1000 / 60);
-                };
-            })();
-            
             //Init
             MainInit.init();
             
             //run animations
             //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
             (function animloop(){
-                requestAnimFrame(animloop);
-                
                 frameCount++; //for statistics
                 
                 //clear canvas:
@@ -436,6 +441,7 @@
                 for (var key in all_circles) {
                     all_circles[key].animate();
                 }
+                window.requestAnimationFrame(animloop);
             })();
             
             //run statistics:
