@@ -75,7 +75,7 @@
             
             //Main init object
             //Run at the begining
-            var MainInit = {
+            var Init = {
                 max_radius: 0,
                 centerX: 0,
                 centerY: 0,
@@ -215,9 +215,9 @@
             Circle.prototype.animate = function(){
 
                 Circles.ctx.save();
-                Circles.ctx.translate(MainInit.centerX, MainInit.centerY); //move canvas to newer position
+                Circles.ctx.translate(Init.centerX, Init.centerY); //move canvas to newer position
                 Circles.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
-                Circles.ctx.translate(-MainInit.centerX, -MainInit.centerY); //move canvas back, so it will be rotated around center
+                Circles.ctx.translate(-Init.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
  
                 
                 //TODO code duplicity with Circle.init(), fix it, fix it
@@ -230,8 +230,8 @@
                     Circles.ctx.lineWidth = this.properties.lineWidth;
                     Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.arc(
-                        MainInit.centerX,
-                        MainInit.centerY,
+                        Init.centerX,
+                        Init.centerY,
                         this.properties.radius,
                         typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
                         this.scheme[key+1]['radian'],
@@ -366,8 +366,8 @@
                     // draw a sector
                     Circles.ctx.beginPath();
                     Circles.ctx.arc(
-                        MainInit.centerX,
-                        MainInit.centerY,
+                        Init.centerX,
+                        Init.centerY,
                         this.properties.radius,
                         typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
                         this.scheme[key+1]['radian'],
@@ -427,7 +427,7 @@
             }
             
             //Init
-            MainInit.init();
+            Init.init();
             
             //run animations
             //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
