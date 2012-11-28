@@ -16,35 +16,48 @@
             body {
                 background-color: black;
                 text-align: center;
+                margin: 0;
+                padding: 0;                
             }
             h1 {
                 font-size: large;
             }            
-            h1, p {
+            h1, p, a, a:hover {
                 color: white;
             }
             div {
                 padding: 0;
                 margin: 0;
             }
-            #draw, #draw div {
-                background-color: transparent;
-            }
-            #draw div {
-                position: absolute;
-                top: 90px;
-            }
             noscript {
                 color: red;
+            }
+            header, footer {
+                display: block;
+                width: 100%;
+            }
+           .inner {
+                display: inline-block; /*center inner div*/
+            }
+            footer p {
+                width: 100px;
+                float: left;
             }
         </style>
     </head>
     <body>
-        <h1>Tron circles</h1>
-        <p>Refresh your browser to generate new circles.</p>
-        <p>FPS: <span id="fps"></span></p>
-        <noscript>Please turn on Javascript or use another web browser (Firefox, Chrome, Opera/Mobile).</noscript>
-        <div id="draw"></div>
+        <header>
+            <h1>Tron circles</h1>
+            <p>Refresh your browser to generate new circles.</p>
+        </header>
+        <div id="draw"><noscript>Please turn on Javascript or use another web browser (Firefox, Chrome, Opera/Mobile).</noscript></div>
+        <footer>
+            <div class="inner">
+                <p><b>FPS: </b><span id="fps"></span></p>
+                <p><a href="https://github.com/pdragun/tron-circles"><b>About</b></a></p>
+                <p><a href="https://github.com/pdragun"><b>Author</b></a></p>
+            </div>
+        </footer>
         <script type="text/javascript">
             //<![CDATA[
 
@@ -105,8 +118,13 @@
                     color_scheme[3][1] = '0,29,39';
                     
                     //Check size of browser
-                    Circles.width = window.innerWidth - 70; //Minus random value //TODO count this properly!
-                    Circles.height = window.innerHeight - 100; //Minus random value //TODO count this properly!
+                    var header_height = document.getElementsByTagName('header')[0].offsetHeight;
+                    /*style.paddingTop*/
+                    var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
+                    
+                    //Check size of browser
+                    Circles.height = window.innerHeight - (header_height + footer_height + 50);
+                    Circles.width = window.innerWidth;
 
                     //Create canvas element
                     Circles.init();
