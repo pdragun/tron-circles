@@ -159,10 +159,8 @@
                         temp_properties.rotation = rotation_direction * temp_properties.rotation; //final rotation, with degree and direction
                         
                         temp_properties.rotateToAngle = temp_properties.startAngle + temp_properties.rotation;
-                        if(temp_properties.rotateToAngle < 0 ) {
-                            temp_properties.rotateToAngle = 360 + temp_properties.rotateToAngle;
-                        } else if (temp_properties.rotateToAngle > 360) {
-                            temp_properties.rotateToAngle = temp_properties.rotateToAngle - 360;
+                        if(temp_properties.rotateToAngle < 0 || temp_properties.rotateToAngle > 360) {
+                            temp_properties.rotateToAngle = Math.abs(360 - Math.abs(temp_properties.rotateToAngle));
                         }
                         //rotation end
 
@@ -272,12 +270,10 @@
                 
                 //count next position //TODO there code duplicity with lines 90 - 100, fix it, fix it
                 this.properties.rotateToAngle = this.properties.rotateToAngle + this.properties.rotation;
-                if(this.properties.rotateToAngle < 0 ) {
-                    this.properties.rotateToAngle = 360 + this.properties.rotateToAngle;
-                } else if (this.properties.rotateToAngle > 360) {
-                    this.properties.rotateToAngle = this.properties.rotateToAngle - 360;
+                if(this.properties.rotateToAngle < 0 || this.properties.rotateToAngle > 360) {
+                    this.properties.rotateToAngle = Math.abs(360 - Math.abs(this.properties.rotateToAngle));
                 }
-                
+
                 return true;
             }
             Circle.prototype.setColorScheme = function(scheme){
