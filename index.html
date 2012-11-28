@@ -181,7 +181,6 @@
                     deep++;
                     if(deep === 10) return false;
                     
-                    //TODO: rename this temporary variables!!
                     var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
                     
                     var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
@@ -237,34 +236,16 @@
             }
             Circle.prototype.animate = function(){
 
+                //Rotate canvas
                 Circles.ctx.save();
                 Circles.ctx.translate(Init.centerX, Init.centerY); //move canvas to newer position
                 Circles.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
                 Circles.ctx.translate(-Init.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
- 
                 
-                //TODO code duplicity with Circle.init(), fix it, fix it
-                for (var key in this.scheme) {
-                    key = parseInt(key);
-            
-                    if( typeof(this.scheme[key+1]) == 'undefined') break;
+                //Draw Circle
+                this.draw();
 
-                    Circles.ctx.beginPath();
-                    Circles.ctx.lineWidth = this.properties.lineWidth;
-                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
-                    Circles.ctx.arc(
-                        Init.centerX,
-                        Init.centerY,
-                        this.properties.radius,
-                        typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
-                        this.scheme[key+1]['radian'],
-                        this.properties.counterclockwise
-                    );
-
-                    Circles.ctx.stroke();
-                    Circles.ctx.closePath()
-                }
-
+                //Put canvas back (for other circles)
                 Circles.ctx.restore();
                 
                 //Count rotate angle for next frame
@@ -279,7 +260,7 @@
                 this.scheme = scheme;
                 return true;
             }
-            //method to set color for each peace
+            //method to set color for each piece
             //this method run only once for each circe
             Circle.prototype.countColorScheme = function() {
                 
@@ -380,10 +361,11 @@
                 return begin_color >= end_color ? ratio * -1 : ratio;
                 
             }
-            Circle.prototype.init = function(){
+            //Method for drawing circle
+            Circle.prototype.draw = function() {
                 
-                this.countColorScheme();
-                
+                Circles.ctx.lineWidth = this.properties.lineWidth;
+
                 for (var key in this.scheme) {
                     key = parseInt(key);
             
@@ -400,15 +382,19 @@
                         this.properties.counterclockwise
                     );
                     
-                    Circles.ctx.closePath();
-
                     //stroke a sector
-                    Circles.ctx.lineWidth = this.properties.lineWidth;
                     Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.stroke();
+                    Circles.ctx.closePath();
                 }
+                return true;
             }
-            
+            Circle.prototype.init = function(){
+                
+                this.countColorScheme();
+                this.draw();
+
+            }
             //Circle object
             //Hold reference to all Circle objects
             var Circles = {
