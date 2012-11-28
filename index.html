@@ -117,11 +117,11 @@
                     color_scheme[3][0] = '0,254,255';
                     color_scheme[3][1] = '0,29,39';
                     
-                    //Check size of browser
+                    //Calculate canvas size based on browser widht/height and header/footer width/height
                     var header_height = document.getElementsByTagName('header')[0].offsetHeight;
                     var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
                     
-                    //Check size for canvas
+                    //Set canvas size
                     Circles.height = window.innerHeight - (header_height + footer_height + 50); //random value, because it is not so easy check margin/padding for all inner objects (div,h1,p ...) - without jQuery/..
                     Circles.width = window.innerWidth;
 
