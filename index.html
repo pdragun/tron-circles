@@ -363,6 +363,9 @@
             }
             //Method for drawing circle
             Circle.prototype.draw = function() {
+                
+                Circles.ctx.lineWidth = this.properties.lineWidth;
+
                 for (var key in this.scheme) {
                     key = parseInt(key);
             
@@ -379,12 +382,10 @@
                         this.properties.counterclockwise
                     );
                     
-                    Circles.ctx.closePath();
-
                     //stroke a sector
-                    Circles.ctx.lineWidth = this.properties.lineWidth;
                     Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
                     Circles.ctx.stroke();
+                    Circles.ctx.closePath();
                 }
                 return true;
             }
