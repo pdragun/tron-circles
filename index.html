@@ -122,7 +122,7 @@
                     var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
                     
                     //Check size for canvas
-                    Circles.height = window.innerHeight - (header_height + footer_height + 50);
+                    Circles.height = window.innerHeight - (header_height + footer_height + 50); //random value, because it is not so easy check margin/padding for all inner objects (div,h1,p ...) - without jQuery/..
                     Circles.width = window.innerWidth;
 
                     //Create canvas element
