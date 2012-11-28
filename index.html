@@ -179,7 +179,7 @@
                 },
                 findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
                     
-                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (in future: change line_width and count again)
+                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
                     deep++;
                     if(deep === 10) return false;
                     
@@ -195,22 +195,23 @@
                     }
                     
                     //We have already some circles, need to check if collision or not
-                    var t_radius, t_radious_min, t_radious_max;
+                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
                     for(var key in all_circles) {
-                        t_radius = all_circles[key].properties.radius  //'normal' radius
+                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
                         
-                        t_radious_min = t_radius - Math.round(all_circles[key].properties.lineWidth / 2);
-                        t_radious_max = t_radius + Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
 
                         //if true, we have collision
-                        if(   (max_line_radius >= t_radious_max && min_line_radius < t_radious_max && min_line_radius > t_radious_min)
-                            || (max_line_radius <= t_radious_max && max_line_radius >= t_radious_min && min_line_radius < t_radious_min)
+                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
+                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
                     ){
-
+                            //recursion
                             return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
                         }
 
                     }
+                    //no collision
                     return circle_radius;
                 }
             }
