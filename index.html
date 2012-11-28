@@ -136,7 +136,7 @@
                     
                     //Uncoment line below, if you want draw only one circle
                     //circle_numbers = 0;
-                    for (var i = 0; i<=circle_numbers; i++ ) {
+                    for (var i = 0; i <= circle_numbers; i++ ) {
 
                         var temp_properties = new Properties();
                         temp_properties.number = i;
@@ -151,6 +151,7 @@
                         temp_properties.counterclockwise = Math.round(Math.random() * 1); //random boolean 1 = true or 0 = false
                         
                         temp_properties.colorScheme = color_scheme[Math.round(Math.random() * 3)]; //random value from list of schemes (it is array with 4 keys (0,1,2,3))
+
 
                         //rotation start
                         temp_properties.rotation = Math.round(Math.random() * 10) + 1; //random degree 1° - 10°
@@ -202,17 +203,17 @@
                         //if true, we have collision
                         if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
                             || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
-                    ){
+                            ){
                             //recursion
                             return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
                         }
-
                     }
                     //no collision
                     return circle_radius;
                 }
             }
-            
+
+
             //Contstructor of Properties object
             //Hold basic properties for circle
             function Properties() {
@@ -262,12 +263,11 @@
 
                     Circles.ctx.stroke();
                     Circles.ctx.closePath()
- 
                 }
 
                 Circles.ctx.restore();
                 
-                //count next position //TODO there code duplicity with lines 90 - 100, fix it, fix it
+                //Count rotate angle for next frame
                 this.properties.rotateToAngle = this.properties.rotateToAngle + this.properties.rotation;
                 if(this.properties.rotateToAngle < 0 || this.properties.rotateToAngle > 360) {
                     this.properties.rotateToAngle = Math.abs(360 - Math.abs(this.properties.rotateToAngle));
