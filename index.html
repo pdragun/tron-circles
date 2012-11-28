@@ -284,6 +284,8 @@
                 this.scheme = scheme;
                 return true;
             }
+            //method to set color for each peace
+            //this method run only once for each circe
             Circle.prototype.countColorScheme = function() {
                 
                 var all_drawable_pieces = 0;
@@ -318,20 +320,18 @@
                 
                 //TODO: add random choice for begin and end color - take random color from color range!
                 
-                var splited_scheme = [];
-                //set whic color will be begin and which end
-                //TODO make it shorter!!
-                if(Math.round(Math.random() * 1) === 0) {
-                    splited_scheme = this.properties.colorScheme[0].split(',');
-                    temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
-                    temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
-                    temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
+                //Set which color will begin and which end
+                var splited_scheme =  this.properties.colorScheme[0].split(',');
+                temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
+                temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
+                temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
 
-                    splited_scheme = this.properties.colorScheme[1].split(',');
-                    temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
-                    temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
-                    temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
-                } else {
+                splited_scheme = this.properties.colorScheme[1].split(',');
+                temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
+                temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
+                temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
+                
+                if(Math.round(Math.random() * 1) === 0) {   //with ratio 50/50 change begin color to end color (or not)
                     splited_scheme = this.properties.colorScheme[1].split(',');
                     temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
                     temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
@@ -343,12 +343,17 @@
                     temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
                 }
 
+                //ratio between begin begin color and end color and number of drawable pieces
+                //(e.g. begin color is 10 (rgb value) and end color is 20 and drawable pieces is 5 so
+                //the first piece will have color value 12, next 14, 16, 18 and 20
                 var ratio_r = this.countColorRatioAndDirection(temp_scheme['begin']['r'], temp_scheme['end']['r'], all_drawable_pieces);
                 var ratio_g = this.countColorRatioAndDirection(temp_scheme['begin']['g'], temp_scheme['end']['g'], all_drawable_pieces);
                 var ratio_b = this.countColorRatioAndDirection(temp_scheme['begin']['b'], temp_scheme['end']['b'], all_drawable_pieces);
 
+                //set color for each piece
                 var color_scheme = [];
                 color_scheme[0] = [];
+                //first piece
                 color_scheme[0]['rgb'] = 'rgb('+temp_scheme['begin']['r']+','+temp_scheme['begin']['g']+','+temp_scheme['begin']['b']+')';
                 color_scheme[0]['radian'] = this.properties.startAngle * Math.PI / 180;
                 
@@ -358,6 +363,7 @@
                     angle += radian_direction;
                    
                     color_scheme[i] = [];
+                    //other pieces
                     color_scheme[i]['rgb']  = 'rgb('+ Math.round(temp_scheme['begin']['r'] + (ratio_r * i))+','+
                                             +Math.round(temp_scheme['begin']['g'] + (ratio_g * i))+','+
                                             +Math.round(temp_scheme['begin']['b'] + (ratio_b * i))+')';
