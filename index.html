@@ -166,7 +166,7 @@
                         }
                         //rotation end
 
-
+                        //We have enough data, create new circle
                         var NewCircle = new Circle(temp_properties);
                         Circles.addCircle(NewCircle)                        
                     }
@@ -234,7 +234,7 @@
             //Constructor of object Circle, 
             //Each circle has it's own object
             function Circle(properties){
-                this.properties = properties; //see function Properties for more info
+                this.properties = properties; //see function/object Properties for more info
                 this.scheme = null; //color scheme
             }
             Circle.prototype.animate = function(){
@@ -291,7 +291,7 @@
                 if (this.properties.counterclockwise === 0) { //arc is clockwise
                     
                     if( this.properties.startAngle > this.properties.endAngle ) { //we are going through 360°/0°
-                        var temp_degree1, temp_degree1;
+                        var temp_degree1, temp_degree2;
                         temp_degree1 = 360 - this.properties.startAngle;
                         temp_degree2 = this.properties.endAngle;
                         all_drawable_pieces = temp_degree1 + temp_degree2;
@@ -411,7 +411,7 @@
             
             //Hold reference to all Circle objects
             var Circles = {
-                circles_collection: [], //array for all circle objects
+                circles_collection: [], //array with all circle objects
                 ctx: null, //reference to canvas object
                 width: 0, //int, size of browser 
                 height: 0, //int, size of browser 
