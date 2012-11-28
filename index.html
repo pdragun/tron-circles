@@ -184,32 +184,34 @@
                     if(deep === 10) return false;
                     
                     //TODO: rename this temporary variables!!
-                    var temp_circle_radius = Math.floor(Math.random() * max_radius) + min_radius;
-                    var temp_circle_min_radius_with_line = temp_circle_radius - Math.round(line_width / 2) - 1;
-                    var temp_circle_max_radius_with_line = temp_circle_radius + Math.round(line_width / 2) + 1;
+                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
+                    
+                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
+                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
 
-                    //No circle has been set yet, return radius
+                    //If no circle has been set yet, return current radius (= no collision)
                     if(all_circles.length < 1){
-                        return temp_circle_radius;
+                        return circle_radius;
                     }
                     
-                    //We have already some circles, looking for possible collision
+                    //We have already some circles, need to check if collision or not
                     var t_radius, t_radious_min, t_radious_max;
                     for(var key in all_circles) {
-                        t_radius = all_circles[key].properties.radius
+                        t_radius = all_circles[key].properties.radius  //'normal' radius
+                        
                         t_radious_min = t_radius - Math.round(all_circles[key].properties.lineWidth / 2);
                         t_radious_max = t_radius + Math.round(all_circles[key].properties.lineWidth / 2);
 
                         //if true, we have collision
-                        if(   (temp_circle_max_radius_with_line >= t_radious_max && temp_circle_min_radius_with_line < t_radious_max && temp_circle_min_radius_with_line > t_radious_min)
-                            || (temp_circle_max_radius_with_line <= t_radious_max && temp_circle_max_radius_with_line >= t_radious_min && temp_circle_min_radius_with_line < t_radious_min)
+                        if(   (max_line_radius >= t_radious_max && min_line_radius < t_radious_max && min_line_radius > t_radious_min)
+                            || (max_line_radius <= t_radious_max && max_line_radius >= t_radious_min && min_line_radius < t_radious_min)
                     ){
 
                             return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
                         }
 
                     }
-                    return temp_circle_radius;
+                    return circle_radius;
                 }
             }
             
