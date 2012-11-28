@@ -117,13 +117,12 @@
                     color_scheme[3][0] = '0,254,255';
                     color_scheme[3][1] = '0,29,39';
                     
-                    //Check size of browser
+                    //Calculate canvas size based on browser widht/height and header/footer width/height
                     var header_height = document.getElementsByTagName('header')[0].offsetHeight;
-                    /*style.paddingTop*/
                     var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
                     
-                    //Check size of browser
-                    Circles.height = window.innerHeight - (header_height + footer_height + 50);
+                    //Set canvas size
+                    Circles.height = window.innerHeight - (header_height + footer_height + 50); //random value, because it is not so easy check margin/padding for all inner objects (div,h1,p ...) - without jQuery/..
                     Circles.width = window.innerWidth;
 
                     //Create canvas element
@@ -137,7 +136,7 @@
                     
                     //Uncoment line below, if you want draw only one circle
                     //circle_numbers = 0;
-                    for (var i = 0; i<=circle_numbers; i++ ) {
+                    for (var i = 0; i <= circle_numbers; i++ ) {
 
                         var temp_properties = new Properties();
                         temp_properties.number = i;
@@ -153,20 +152,19 @@
                         
                         temp_properties.colorScheme = color_scheme[Math.round(Math.random() * 3)]; //random value from list of schemes (it is array with 4 keys (0,1,2,3))
 
+
                         //rotation start
                         temp_properties.rotation = Math.round(Math.random() * 10) + 1; //random degree 1° - 10°
                         var rotation_direction = Math.round(Math.random() * 1)? 1: -1; //random direction 1 or -1
                         temp_properties.rotation = rotation_direction * temp_properties.rotation; //final rotation, with degree and direction
                         
                         temp_properties.rotateToAngle = temp_properties.startAngle + temp_properties.rotation;
-                        if(temp_properties.rotateToAngle < 0 ) {
-                            temp_properties.rotateToAngle = 360 + temp_properties.rotateToAngle;
-                        } else if (temp_properties.rotateToAngle > 360) {
-                            temp_properties.rotateToAngle = temp_properties.rotateToAngle - 360;
+                        if(temp_properties.rotateToAngle < 0 || temp_properties.rotateToAngle > 360) {
+                            temp_properties.rotateToAngle = Math.abs(360 - Math.abs(temp_properties.rotateToAngle));
                         }
                         //rotation end
 
-
+                        //We have enough data, create new circle
                         var NewCircle = new Circle(temp_properties);
                         Circles.addCircle(NewCircle)                        
                     }
@@ -179,41 +177,44 @@
                 },
                 findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
                     
-                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (in future: change line_width and count again)
+                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
                     deep++;
                     if(deep === 10) return false;
                     
                     //TODO: rename this temporary variables!!
-                    var temp_circle_radius = Math.floor(Math.random() * max_radius) + min_radius;
-                    var temp_circle_min_radius_with_line = temp_circle_radius - Math.round(line_width / 2) - 1;
-                    var temp_circle_max_radius_with_line = temp_circle_radius + Math.round(line_width / 2) + 1;
+                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
+                    
+                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
+                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
 
-                    //No circle has been set yet, return radius
+                    //If no circle has been set yet, return current radius (= no collision)
                     if(all_circles.length < 1){
-                        return temp_circle_radius;
+                        return circle_radius;
                     }
                     
-                    //We have already some circles, looking for possible collision
-                    var t_radius, t_radious_min, t_radious_max;
+                    //We have already some circles, need to check if collision or not
+                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
                     for(var key in all_circles) {
-                        t_radius = all_circles[key].properties.radius
-                        t_radious_min = t_radius - Math.round(all_circles[key].properties.lineWidth / 2);
-                        t_radious_max = t_radius + Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
+                        
+                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
 
                         //if true, we have collision
-                        if(   (temp_circle_max_radius_with_line >= t_radious_max && temp_circle_min_radius_with_line < t_radious_max && temp_circle_min_radius_with_line > t_radious_min)
-                            || (temp_circle_max_radius_with_line <= t_radious_max && temp_circle_max_radius_with_line >= t_radious_min && temp_circle_min_radius_with_line < t_radious_min)
-                    ){
-
+                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
+                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
+                            ){
+                            //recursion
                             return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
                         }
-
                     }
-                    return temp_circle_radius;
+                    //no collision
+                    return circle_radius;
                 }
             }
-            
-            
+
+
+            //Contstructor of Properties object
             //Hold basic properties for circle
             function Properties() {
                 this.number = 0; //int, nubmer e.g. 1,2, ...13
@@ -228,10 +229,10 @@
             }
             
             
-            //Constructor of object Circle, 
+            //Constructor of object Circle
             //Each circle has it's own object
             function Circle(properties){
-                this.properties = properties; //see function Properties for more info
+                this.properties = properties; //see function/object Properties for more info
                 this.scheme = null; //color scheme
             }
             Circle.prototype.animate = function(){
@@ -262,25 +263,24 @@
 
                     Circles.ctx.stroke();
                     Circles.ctx.closePath()
- 
                 }
 
                 Circles.ctx.restore();
                 
-                //count next position //TODO there code duplicity with lines 90 - 100, fix it, fix it
+                //Count rotate angle for next frame
                 this.properties.rotateToAngle = this.properties.rotateToAngle + this.properties.rotation;
-                if(this.properties.rotateToAngle < 0 ) {
-                    this.properties.rotateToAngle = 360 + this.properties.rotateToAngle;
-                } else if (this.properties.rotateToAngle > 360) {
-                    this.properties.rotateToAngle = this.properties.rotateToAngle - 360;
+                if(this.properties.rotateToAngle < 0 || this.properties.rotateToAngle > 360) {
+                    this.properties.rotateToAngle = Math.abs(360 - Math.abs(this.properties.rotateToAngle));
                 }
-                
+
                 return true;
             }
             Circle.prototype.setColorScheme = function(scheme){
                 this.scheme = scheme;
                 return true;
             }
+            //method to set color for each peace
+            //this method run only once for each circe
             Circle.prototype.countColorScheme = function() {
                 
                 var all_drawable_pieces = 0;
@@ -288,7 +288,7 @@
                 if (this.properties.counterclockwise === 0) { //arc is clockwise
                     
                     if( this.properties.startAngle > this.properties.endAngle ) { //we are going through 360°/0°
-                        var temp_degree1, temp_degree1;
+                        var temp_degree1, temp_degree2;
                         temp_degree1 = 360 - this.properties.startAngle;
                         temp_degree2 = this.properties.endAngle;
                         all_drawable_pieces = temp_degree1 + temp_degree2;
@@ -315,20 +315,18 @@
                 
                 //TODO: add random choice for begin and end color - take random color from color range!
                 
-                var splited_scheme = [];
-                //set whic color will be begin and which end
-                //TODO make it shorter!!
-                if(Math.round(Math.random() * 1) === 0) {
-                    splited_scheme = this.properties.colorScheme[0].split(',');
-                    temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
-                    temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
-                    temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
+                //Set which color will begin and which end
+                var splited_scheme =  this.properties.colorScheme[0].split(',');
+                temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
+                temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
+                temp_scheme['begin']['b'] = parseInt(splited_scheme[2]);
 
-                    splited_scheme = this.properties.colorScheme[1].split(',');
-                    temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
-                    temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
-                    temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
-                } else {
+                splited_scheme = this.properties.colorScheme[1].split(',');
+                temp_scheme['end']['r'] = parseInt(splited_scheme[0]);
+                temp_scheme['end']['g'] = parseInt(splited_scheme[1]);
+                temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
+                
+                if(Math.round(Math.random() * 1) === 0) {   //with ratio 50/50 change begin color to end color (or not)
                     splited_scheme = this.properties.colorScheme[1].split(',');
                     temp_scheme['begin']['r'] = parseInt(splited_scheme[0]);
                     temp_scheme['begin']['g'] = parseInt(splited_scheme[1]);
@@ -340,12 +338,17 @@
                     temp_scheme['end']['b'] = parseInt(splited_scheme[2]);
                 }
 
+                //ratio between begin begin color and end color and number of drawable pieces
+                //(e.g. begin color is 10 (rgb value) and end color is 20 and drawable pieces is 5 so
+                //the first piece will have color value 12, next 14, 16, 18 and 20
                 var ratio_r = this.countColorRatioAndDirection(temp_scheme['begin']['r'], temp_scheme['end']['r'], all_drawable_pieces);
                 var ratio_g = this.countColorRatioAndDirection(temp_scheme['begin']['g'], temp_scheme['end']['g'], all_drawable_pieces);
                 var ratio_b = this.countColorRatioAndDirection(temp_scheme['begin']['b'], temp_scheme['end']['b'], all_drawable_pieces);
 
+                //set color for each piece
                 var color_scheme = [];
                 color_scheme[0] = [];
+                //first piece
                 color_scheme[0]['rgb'] = 'rgb('+temp_scheme['begin']['r']+','+temp_scheme['begin']['g']+','+temp_scheme['begin']['b']+')';
                 color_scheme[0]['radian'] = this.properties.startAngle * Math.PI / 180;
                 
@@ -355,6 +358,7 @@
                     angle += radian_direction;
                    
                     color_scheme[i] = [];
+                    //other pieces
                     color_scheme[i]['rgb']  = 'rgb('+ Math.round(temp_scheme['begin']['r'] + (ratio_r * i))+','+
                                             +Math.round(temp_scheme['begin']['g'] + (ratio_g * i))+','+
                                             +Math.round(temp_scheme['begin']['b'] + (ratio_b * i))+')';
@@ -405,13 +409,13 @@
                 }
             }
             
-            
+            //Circle object
             //Hold reference to all Circle objects
             var Circles = {
-                circles_collection: [], //array for all circle objects
+                circles_collection: [], //array with all circle objects
                 ctx: null, //reference to canvas object
-                width: 0, //int, size of browser 
-                height: 0, //int, size of browser 
+                width: 0, //size of canvas in px [int]
+                height: 0, //size of canvas in px [int]
 
                 //collect all circle objects in array, insert circle object
                 addCircle: function(circle){
