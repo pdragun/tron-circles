@@ -126,8 +126,8 @@
                     color_scheme[3][1] = '0,29,39';
                     
                     //Calculate canvas size based on browser widht/height and header/footer width/height
-                    var header_height = document.getElementsByTagName('header')[0].offsetHeight;
-                    var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
+                    var header_height = document.getElementById('header').offsetHeight;
+                    var footer_height = document.getElementById('footer').offsetHeight;
 
                     //Set canvas size
                     Circles.height = window.innerHeight - (header_height + footer_height + 20); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
