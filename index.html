@@ -33,26 +33,33 @@
             noscript {
                 color: red;
             }
-            header, footer {
+            #header, #footer {
                 display: block;
                 width: 100%;
+            }
+            #header {
+                height: 90px;
+            }
+            #footer {
+                height: 40px;
             }
            .inner {
                 display: inline-block; /*center inner div*/
             }
-            footer p {
+            #footer p {
                 width: 100px;
                 float: left;
+                margin: 5px 0;
             }
         </style>
     </head>
     <body>
-        <header>
+        <header id="header">
             <h1>Tron circles</h1>
             <p>Refresh your browser to generate new circles.</p>
         </header><!-- #header-->
         <div id="draw"><noscript>Please turn on Javascript or use another web browser (Firefox, Chrome, Opera/Mobile).</noscript></div>
-        <footer>
+        <footer id="footer">
             <div class="inner">
                 <p><b>FPS: </b><span id="fps"></span></p>
                 <p><a href="https://github.com/pdragun/tron-circles"><b>About</b></a></p>
@@ -121,9 +128,9 @@
                     //Calculate canvas size based on browser widht/height and header/footer width/height
                     var header_height = document.getElementsByTagName('header')[0].offsetHeight;
                     var footer_height = document.getElementsByTagName('footer')[0].offsetHeight;
-                    
+
                     //Set canvas size
-                    Circles.height = window.innerHeight - (header_height + footer_height + 50); //random value, because it is not so easy check margin/padding for all inner objects (div,h1,p ...) - without jQuery/..
+                    Circles.height = window.innerHeight - (header_height + footer_height + 20); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Circles.width = window.innerWidth;
 
                     //Create canvas element
