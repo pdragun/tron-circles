@@ -445,9 +445,6 @@
                 frame_count: 0, //number of frames
                 html_fps: null, //pointer to DOM to display FPS
                 timeout_id: null,
-                addFrame: function(){
-                    this.frame_count++;
-                },
                 resetFrames: function(){
                     this.displayFPS();
                     this.frame_count = 0;
@@ -473,7 +470,7 @@
             //run animations
             //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
             (function animloop(){
-                Statistics.addFrame(); //for statistics
+                Statistics.frame_count++; //for statistics
                 
                 //clear canvas:
                 Circles.ctx.clearRect(0, 0, Circles.width, Circles.height);
