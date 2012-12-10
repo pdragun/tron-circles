@@ -101,6 +101,7 @@
             //Main init object
             //Run at the begining
             var Init = {
+                no_canvas_support: 'Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.',
                 init: function(){
                     var min_circles = 3; //minimumm circles
                     var max_circles = 10; //maximum circles
@@ -434,7 +435,7 @@
 
                     var canvas_div = document.createElement('div');
 
-                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+Playground.width+'\" height=\"'+Playground.height+'\">Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.<\/canvas>';
+                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+Playground.width+'\" height=\"'+Playground.height+'\">'+Init.no_canvas_support+'<\/canvas>';
                     canvas_div.innerHTML = canvas_html;
 
                     document.getElementById('draw').appendChild(canvas_div);
