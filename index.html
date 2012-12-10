@@ -148,7 +148,7 @@
                         
                         temp_properties.lineWidth = Math.floor(Math.random() * max_line_width) + min_line_width;
                         
-                        temp_properties.radius = this.findRadius(Circles.getCircles(), min_radius, Playground.max_radius, temp_properties.lineWidth, 0);
+                        temp_properties.radius = Circles.findRadius(Circles.getCircles(), min_radius, Playground.max_radius, temp_properties.lineWidth, 0);
                         if(temp_properties.radius === false) continue; //can not find radius for this circle (because of collision), skip it
                         
                         temp_properties.startAngle = Math.round(Math.random() * 360); //random degree from 0° to 360°
@@ -184,41 +184,6 @@
                     var html_fps = document.getElementById('fps');
                     Statistics.init(html_fps);
                     Statistics.start();
-                },
-                findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
-                    
-                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
-                    deep++;
-                    if(deep === 10) return false;
-                    
-                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
-                    
-                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
-                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
-
-                    //If no circle has been set yet, return current radius (= no collision)
-                    if(all_circles.length < 1){
-                        return circle_radius;
-                    }
-                    
-                    //We have already some circles, need to check if collision or not
-                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
-                    for(var key in all_circles) {
-                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
-                        
-                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
-                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
-
-                        //if true, we have collision
-                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
-                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
-                            ){
-                            //recursion
-                            return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
-                        }
-                    }
-                    //no collision
-                    return circle_radius;
                 }
             }
 
@@ -442,6 +407,42 @@
                     var canvas = document.getElementById('playground_canvas');
                     
                     this.ctx = canvas.getContext('2d');
+                },
+                //recursion
+                findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
+                    
+                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
+                    deep++;
+                    if(deep === 10) return false;
+                    
+                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
+                    
+                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
+                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
+
+                    //If no circle has been set yet, return current radius (= no collision)
+                    if(all_circles.length < 1){
+                        return circle_radius;
+                    }
+                    
+                    //We have already some circles, need to check if collision or not
+                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
+                    for(var key in all_circles) {
+                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
+                        
+                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
+
+                        //if true, we have collision
+                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
+                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
+                            ){
+                            //recursion
+                            return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
+                        }
+                    }
+                    //no collision
+                    return circle_radius;
                 }
             }
             
