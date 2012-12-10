@@ -136,7 +136,7 @@
                     Circles.init();
 
                     Playground.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
-                    this.centerX = Math.round(Playground.width / 2);
+                    Playground.centerX = Math.round(Playground.width / 2);
                     this.centerY = Math.round(Playground.height / 2);
 
                     var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
@@ -260,9 +260,9 @@
 
                 //Rotate canvas
                 Circles.ctx.save();
-                Circles.ctx.translate(Init.centerX, Init.centerY); //move canvas to newer position
+                Circles.ctx.translate(Playground.centerX, Init.centerY); //move canvas to newer position
                 Circles.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
-                Circles.ctx.translate(-Init.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
+                Circles.ctx.translate(-Playground.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
                 
                 //Draw Circle
                 this.draw();
@@ -396,7 +396,7 @@
                     // draw a sector
                     Circles.ctx.beginPath();
                     Circles.ctx.arc(
-                        Init.centerX,
+                        Playground.centerX,
                         Init.centerY,
                         this.properties.radius,
                         typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
