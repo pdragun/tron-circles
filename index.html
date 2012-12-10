@@ -101,10 +101,7 @@
             //Main init object
             //Run at the begining
             var Init = {
-                max_radius: 0,
-                centerX: 0,
-                centerY: 0,
-                
+                no_canvas_support: 'Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.',
                 init: function(){
                     var min_circles = 3; //minimumm circles
                     var max_circles = 10; //maximum circles
@@ -130,15 +127,15 @@
                     var footer_height = document.getElementById('footer').offsetHeight;
 
                     //Set canvas size
-                    Circles.height = window.innerHeight - (header_height + footer_height + 50); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
-                    Circles.width = window.innerWidth;
+                    Playground.height = window.innerHeight - (header_height + footer_height + 50); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
+                    Playground.width = window.innerWidth;
 
                     //Create canvas element
                     Circles.init();
 
-                    this.max_radius = Circles.width >= Circles.height ? Circles.height/2 : Circles.width/2;
-                    this.centerX = Math.round(Circles.width / 2);
-                    this.centerY = Math.round(Circles.height / 2);
+                    Playground.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
+                    Playground.center_x = Math.round(Playground.width / 2);
+                    Playground.center_y = Math.round(Playground.height / 2);
 
                     var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
                     
@@ -151,7 +148,7 @@
                         
                         temp_properties.lineWidth = Math.floor(Math.random() * max_line_width) + min_line_width;
                         
-                        temp_properties.radius = this.findRadius(Circles.getCircles(), min_radius, this.max_radius, temp_properties.lineWidth, 0);
+                        temp_properties.radius = Circles.findRadius(Circles.getCircles(), min_radius, Playground.max_radius, temp_properties.lineWidth, 0);
                         if(temp_properties.radius === false) continue; //can not find radius for this circle (because of collision), skip it
                         
                         temp_properties.startAngle = Math.round(Math.random() * 360); //random degree from 0° to 360°
@@ -183,46 +180,26 @@
                         all_circles[key].init();
                     }
                     
+                    //Init and start animation
+                    Animation.init();
+                    Animation.setObjToAnimate(Statistics, Circles);
+                    Animation.start();
+                    
                     //Init Statistics
                     var html_fps = document.getElementById('fps');
                     Statistics.init(html_fps);
                     Statistics.start();
-                },
-                findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
-                    
-                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
-                    deep++;
-                    if(deep === 10) return false;
-                    
-                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
-                    
-                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
-                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
-
-                    //If no circle has been set yet, return current radius (= no collision)
-                    if(all_circles.length < 1){
-                        return circle_radius;
-                    }
-                    
-                    //We have already some circles, need to check if collision or not
-                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
-                    for(var key in all_circles) {
-                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
-                        
-                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
-                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
-
-                        //if true, we have collision
-                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
-                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
-                            ){
-                            //recursion
-                            return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
-                        }
-                    }
-                    //no collision
-                    return circle_radius;
                 }
+            }
+
+
+            //Obj hold basic properties for canvas (not canvas itself)
+            var Playground = {
+                center_x: 0,
+                center_y: 0,
+                width: 0, // playground width [int] px
+                height: 0, // playground height [int] px
+                max_radius: 0, //maximal radius for the biggest circle [int] px
             }
 
 
@@ -247,13 +224,12 @@
                 this.properties = properties; //see function/object Properties for more info
                 this.scheme = null; //color scheme
             }
-            Circle.prototype.animate = function(){
-
+            Circle.prototype.rotate = function(){
                 //Rotate canvas
                 Circles.ctx.save();
-                Circles.ctx.translate(Init.centerX, Init.centerY); //move canvas to newer position
+                Circles.ctx.translate(Playground.center_x, Playground.center_y); //move canvas to newer position
                 Circles.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
-                Circles.ctx.translate(-Init.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
+                Circles.ctx.translate(-Playground.center_x, -Playground.center_y); //move canvas back, so it will be rotated around center
                 
                 //Draw Circle
                 this.draw();
@@ -269,12 +245,16 @@
 
                 return true;
             }
+            Circle.prototype.animate = function(){
+                this.rotate();
+            }
             Circle.prototype.setColorScheme = function(scheme){
                 this.scheme = scheme;
                 return true;
             }
             //method to set color for each piece
             //this method run only once for each circe
+            //TODO rename it and split it!!
             Circle.prototype.countColorScheme = function() {
                 
                 var all_drawable_pieces = 0;
@@ -387,8 +367,8 @@
                     // draw a sector
                     Circles.ctx.beginPath();
                     Circles.ctx.arc(
-                        Init.centerX,
-                        Init.centerY,
+                        Playground.center_x,
+                        Playground.center_y,
                         this.properties.radius,
                         typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
                         this.scheme[key+1]['radian'],
@@ -408,13 +388,13 @@
                 this.draw();
 
             }
+            
+            
             //Circle object
             //Hold reference to all Circle objects
             var Circles = {
                 circles_collection: [], //array with all circle objects
                 ctx: null, //reference to canvas object
-                width: 0, //size of canvas in px [int]
-                height: 0, //size of canvas in px [int]
 
                 //collect all circle objects in array, insert circle object
                 addCircle: function(circle){
@@ -430,22 +410,71 @@
 
                     var canvas_div = document.createElement('div');
 
-                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+this.width+'\" height=\"'+this.height+'\">Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.<\/canvas>';
+                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+Playground.width+'\" height=\"'+Playground.height+'\">'+Init.no_canvas_support+'<\/canvas>';
                     canvas_div.innerHTML = canvas_html;
 
                     document.getElementById('draw').appendChild(canvas_div);
                     var canvas = document.getElementById('playground_canvas');
                     
                     this.ctx = canvas.getContext('2d');
+                },
+                //recursion
+                findRadius: function(all_circles, min_radius, max_radius, line_width, deep){
+                    
+                    //Check if we are not too deep in recursion, if yes return false and 'delete' circle (TODO: change line_width and count again)
+                    deep++;
+                    if(deep === 10) return false;
+                    
+                    var circle_radius = Math.floor(Math.random() * max_radius) + min_radius;  //'normal' radius
+                    
+                    var min_line_radius = circle_radius - Math.round(line_width / 2) - 1; //radius - 1/2 line width = min_line_radius - need to check collision with other circles
+                    var max_line_radius = circle_radius + Math.round(line_width / 2) + 1; //radius + 1/2 line width = max_line_radius - need to check collision with other circles
+
+                    //If no circle has been set yet, return current radius (= no collision)
+                    if(all_circles.length < 1){
+                        return circle_radius;
+                    }
+                    
+                    //We have already some circles, need to check if collision or not
+                    var collision_radius, collision_min_line_radius, collision_max_line_radius;
+                    for(var key in all_circles) {
+                        collision_radius = all_circles[key].properties.radius;  //'normal' radius
+                        
+                        collision_min_line_radius = collision_radius - Math.round(all_circles[key].properties.lineWidth / 2);
+                        collision_max_line_radius = collision_radius + Math.round(all_circles[key].properties.lineWidth / 2);
+
+                        //if true, we have collision
+                        if(   (max_line_radius >= collision_max_line_radius && min_line_radius < collision_max_line_radius && min_line_radius > collision_min_line_radius)
+                            || (max_line_radius <= collision_max_line_radius && max_line_radius >= collision_min_line_radius && min_line_radius < collision_min_line_radius)
+                            ){
+                            //recursion
+                            return this.findRadius(all_circles, min_radius, max_radius, line_width, deep);
+                        }
+                    }
+                    //no collision
+                    return circle_radius;
+                },
+                animate: function(){
+                    this.draw();
+                },
+                draw: function(){
+                    //clear canvas
+                    this.ctx.clearRect(0, 0, Playground.width, Playground.height);
+                    
+                    //draw circles
+                    for (var key in this.circles_collection) {
+                        this.circles_collection[key].animate();
+                    }  
                 }
             }
+            
             
             //Statistics
             var Statistics = {
                 frame_count: 0, //number of frames
                 html_fps: null, //pointer to DOM to display FPS
                 timeout_id: null,
-                addFrame: function(){
+                animate: function(){
                     this.frame_count++;
                 },
                 resetFrames: function(){
@@ -465,25 +494,69 @@
                      clearInterval(this.timeout_id);
                 }
             }
+            
+            
+            var Animation = {
+                animation_id: null,
+                objects_to_animate: null,
+                init: function() {
+                    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+                    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+                    // requestAnimationFrame polyfill by Erik Möller
+                    // fixes from Paul Irish and Tino Zijdel
+                    (function() {
+                        var lastTime = 0;
+                        var vendors = ['ms', 'moz', 'webkit', 'o'];
+                        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+                            window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                || window[vendors[x]+'CancelRequestAnimationFrame'];
+                        }
 
-            
-            //Init
-            Init.init();
-            
-            //run animations
-            //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-            (function animloop(){
-                Statistics.addFrame(); //for statistics
+                        if (!window.requestAnimationFrame)
+                            window.requestAnimationFrame = function(callback, element) {
+                                var currTime = new Date().getTime();
+                                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                                var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+                                timeToCall);
+                                lastTime = currTime + timeToCall;
+                                return id;
+                            };
+
+                        if (!window.cancelAnimationFrame)
+                            window.cancelAnimationFrame = function(id) {
+                                clearTimeout(id);
+                            };
+                    }());
+                },
+                start: function() {
                 
-                //clear canvas:
-                Circles.ctx.clearRect(0, 0, Circles.width, Circles.height);
+                    if( this.objects_to_animate === 'null') return false;
                 
-                var all_circles = Circles.getCircles();
-                for (var key in all_circles) {
-                    all_circles[key].animate();
+                    //run animations
+                    //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+                    (function animloop(){
+                        Animation.frame_count++;
+                        Animation.animate()
+                        this.animation_id = window.requestAnimationFrame(animloop);
+                    })();
+                },
+                stop: function() {
+                     clearInterval(this.timeout_id);
+                },
+                setObjToAnimate: function(objects_to_animate){
+                    this.objects_to_animate = arguments;
+                },
+                animate: function(objects_to_animate) {
+                    for(key in this.objects_to_animate) {
+                        this.objects_to_animate[key].animate();
+                    }
                 }
-                window.requestAnimationFrame(animloop);
-            })();
+            }
+            
+            
+            //Init everything a start
+            Init.init();
             
             //]]>
         </script>
