@@ -101,9 +101,6 @@
             //Main init object
             //Run at the begining
             var Init = {
-                centerX: 0,
-                centerY: 0,
-                
                 init: function(){
                     var min_circles = 3; //minimumm circles
                     var max_circles = 10; //maximum circles
@@ -137,7 +134,7 @@
 
                     Playground.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
                     Playground.centerX = Math.round(Playground.width / 2);
-                    this.centerY = Math.round(Playground.height / 2);
+                    Playground.centerY = Math.round(Playground.height / 2);
 
                     var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
                     
@@ -260,9 +257,9 @@
 
                 //Rotate canvas
                 Circles.ctx.save();
-                Circles.ctx.translate(Playground.centerX, Init.centerY); //move canvas to newer position
+                Circles.ctx.translate(Playground.centerX, Playground.centerY); //move canvas to newer position
                 Circles.ctx.rotate(this.properties.rotateToAngle * Math.PI/180); //rotate it, from degree to radian
-                Circles.ctx.translate(-Playground.centerX, -Init.centerY); //move canvas back, so it will be rotated around center
+                Circles.ctx.translate(-Playground.centerX, -Playground.centerY); //move canvas back, so it will be rotated around center
                 
                 //Draw Circle
                 this.draw();
@@ -397,7 +394,7 @@
                     Circles.ctx.beginPath();
                     Circles.ctx.arc(
                         Playground.centerX,
-                        Init.centerY,
+                        Playground.centerY,
                         this.properties.radius,
                         typeof(this.scheme[key-1]) === 'undefined'? this.scheme[key]['radian']:this.scheme[key-1]['radian'],
                         this.scheme[key+1]['radian'],
