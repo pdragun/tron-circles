@@ -130,15 +130,15 @@
                     var footer_height = document.getElementById('footer').offsetHeight;
 
                     //Set canvas size
-                    Circles.height = window.innerHeight - (header_height + footer_height + 50); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
+                    Playground.height = window.innerHeight - (header_height + footer_height + 50); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Circles.width = window.innerWidth;
 
                     //Create canvas element
                     Circles.init();
 
-                    this.max_radius = Circles.width >= Circles.height ? Circles.height/2 : Circles.width/2;
+                    this.max_radius = Circles.width >= Playground.height ? Playground.height/2 : Circles.width/2;
                     this.centerX = Math.round(Circles.width / 2);
-                    this.centerY = Math.round(Circles.height / 2);
+                    this.centerY = Math.round(Playground.height / 2);
 
                     var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
                     
@@ -424,7 +424,6 @@
                 circles_collection: [], //array with all circle objects
                 ctx: null, //reference to canvas object
                 width: 0, //size of canvas in px [int]
-                height: 0, //size of canvas in px [int]
 
                 //collect all circle objects in array, insert circle object
                 addCircle: function(circle){
@@ -440,7 +439,7 @@
 
                     var canvas_div = document.createElement('div');
 
-                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+this.width+'\" height=\"'+this.height+'\">Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.<\/canvas>';
+                    var canvas_html = '<canvas id=\"playground_canvas\" width=\"'+this.width+'\" height=\"'+Playground.height+'\">Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.<\/canvas>';
                     canvas_div.innerHTML = canvas_html;
 
                     document.getElementById('draw').appendChild(canvas_div);
@@ -483,7 +482,7 @@
                 Statistics.frame_count++; //for statistics
                 
                 //clear canvas:
-                Circles.ctx.clearRect(0, 0, Circles.width, Circles.height);
+                Circles.ctx.clearRect(0, 0, Circles.width, Playground.height);
                 
                 var all_circles = Circles.getCircles();
                 for (var key in all_circles) {
