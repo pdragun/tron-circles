@@ -180,6 +180,11 @@
                         all_circles[key].init();
                     }
                     
+                    //Init and start animation
+                    Animation.init();
+                    Animation.setObjToAnimate(Statistics, Circles);
+                    Animation.start();
+                    
                     //Init Statistics
                     var html_fps = document.getElementById('fps');
                     Statistics.init(html_fps);
@@ -448,14 +453,30 @@
                     }
                     //no collision
                     return circle_radius;
+                },
+                animate: function(){
+                    this.draw();
+                },
+                draw: function(){
+                    //clear canvas
+                    this.ctx.clearRect(0, 0, Playground.width, Playground.height);
+                    
+                    //draw circles
+                    for (var key in this.circles_collection) {
+                        this.circles_collection[key].animate();
+                    }  
                 }
             }
+            
             
             //Statistics
             var Statistics = {
                 frame_count: 0, //number of frames
                 html_fps: null, //pointer to DOM to display FPS
                 timeout_id: null,
+                animate: function(){
+                    this.frame_count++;
+                },
                 resetFrames: function(){
                     this.displayFPS();
                     this.frame_count = 0;
@@ -473,25 +494,69 @@
                      clearInterval(this.timeout_id);
                 }
             }
+            
+            
+            var Animation = {
+                animation_id: null,
+                objects_to_animate: null,
+                init: function() {
+                    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+                    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+                    // requestAnimationFrame polyfill by Erik Möller
+                    // fixes from Paul Irish and Tino Zijdel
+                    (function() {
+                        var lastTime = 0;
+                        var vendors = ['ms', 'moz', 'webkit', 'o'];
+                        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+                            window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                || window[vendors[x]+'CancelRequestAnimationFrame'];
+                        }
 
-            
-            //Init
-            Init.init();
-            
-            //run animations
-            //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-            (function animloop(){
-                Statistics.frame_count++; //for statistics
+                        if (!window.requestAnimationFrame)
+                            window.requestAnimationFrame = function(callback, element) {
+                                var currTime = new Date().getTime();
+                                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                                var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+                                timeToCall);
+                                lastTime = currTime + timeToCall;
+                                return id;
+                            };
+
+                        if (!window.cancelAnimationFrame)
+                            window.cancelAnimationFrame = function(id) {
+                                clearTimeout(id);
+                            };
+                    }());
+                },
+                start: function() {
                 
-                //clear canvas:
-                Circles.ctx.clearRect(0, 0, Playground.width, Playground.height);
+                    if( this.objects_to_animate === 'null') return false;
                 
-                var all_circles = Circles.getCircles();
-                for (var key in all_circles) {
-                    all_circles[key].animate();
+                    //run animations
+                    //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+                    (function animloop(){
+                        Animation.frame_count++;
+                        Animation.animate()
+                        this.animation_id = window.requestAnimationFrame(animloop);
+                    })();
+                },
+                stop: function() {
+                     clearInterval(this.timeout_id);
+                },
+                setObjToAnimate: function(objects_to_animate){
+                    this.objects_to_animate = arguments;
+                },
+                animate: function(objects_to_animate) {
+                    for(key in this.objects_to_animate) {
+                        this.objects_to_animate[key].animate();
+                    }
                 }
-                window.requestAnimationFrame(animloop);
-            })();
+            }
+            
+            
+            //Init everything a start
+            Init.init();
             
             //]]>
         </script>
