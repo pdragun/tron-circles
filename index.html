@@ -101,7 +101,6 @@
             //Main init object
             //Run at the begining
             var Init = {
-                max_radius: 0,
                 centerX: 0,
                 centerY: 0,
                 
@@ -136,7 +135,7 @@
                     //Create canvas element
                     Circles.init();
 
-                    this.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
+                    Playground.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
                     this.centerX = Math.round(Playground.width / 2);
                     this.centerY = Math.round(Playground.height / 2);
 
@@ -151,7 +150,7 @@
                         
                         temp_properties.lineWidth = Math.floor(Math.random() * max_line_width) + min_line_width;
                         
-                        temp_properties.radius = this.findRadius(Circles.getCircles(), min_radius, this.max_radius, temp_properties.lineWidth, 0);
+                        temp_properties.radius = this.findRadius(Circles.getCircles(), min_radius, Playground.max_radius, temp_properties.lineWidth, 0);
                         if(temp_properties.radius === false) continue; //can not find radius for this circle (because of collision), skip it
                         
                         temp_properties.startAngle = Math.round(Math.random() * 360); //random degree from 0° to 360°
