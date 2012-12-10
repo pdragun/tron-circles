@@ -219,8 +219,7 @@
                 this.properties = properties; //see function/object Properties for more info
                 this.scheme = null; //color scheme
             }
-            Circle.prototype.animate = function(){
-
+            Circle.prototype.rotate = function(){
                 //Rotate canvas
                 Circles.ctx.save();
                 Circles.ctx.translate(Playground.center_x, Playground.center_y); //move canvas to newer position
@@ -240,6 +239,9 @@
                 }
 
                 return true;
+            }
+            Circle.prototype.animate = function(){
+                this.rotate();
             }
             Circle.prototype.setColorScheme = function(scheme){
                 this.scheme = scheme;
