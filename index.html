@@ -96,11 +96,6 @@
                     //Calculate canvas size based on browser widht/height and header/footer width/height
                     var header_height = document.getElementById('header').offsetHeight;
                     var footer_height = document.getElementById('footer').offsetHeight;
-                    
-                    //alert(Playground.height);
-                    //alert(Playground.width);
-                    //alert(typeof(Playground.width));
-                    if(!(window.innerWidth > 1 || footer_height > 1)) setTimeout(Init.init(),500); //Fix for opening page from Facebook
 
                     //Set canvas size
                     Playground.height = window.innerHeight - (header_height + footer_height + 30); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
@@ -119,6 +114,7 @@
                     Playground.max_radius -= 10;
                     Playground.center_x = Math.round(Playground.width / 2);
                     Playground.center_y = Math.round(Playground.height / 2);
+                    alert(Playground.center_x + ' ' + Playground.center_y);
 
                     var circle_numbers = Math.floor(Math.random() * max_circles) + min_circles;
                     
