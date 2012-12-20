@@ -192,6 +192,7 @@
                 this.rotateToAngle = 0; //int, in next draw circle, rotate to this angle, default = 0;
                 this.counterclockwise = false; //boolean, false is default (oposit of normal clockwise direction)
                 this.colorScheme = []; //array, color scheme in RGB values, separated by comma
+                this.circle = null; //hold canvas circle after it will be crete
             }
             
             
@@ -200,6 +201,7 @@
             function Circle(properties){
                 this.properties = properties; //see function/object Properties for more info
                 this.scheme = null; //color scheme
+                this.temp_canvas = null; //temp canvas
             }
             Circle.prototype.rotate = function(){
                 //Rotate canvas
@@ -333,8 +335,18 @@
             }
             //Method for drawing circle
             Circle.prototype.draw = function() {
+                Circles.ctx.drawImage(this.temp_canvas, 0, 0);
+                return true;
+            }
+            //Method for creating circle
+            Circle.prototype.create = function() {
                 
-                Circles.ctx.lineWidth = this.properties.lineWidth;
+                this.temp_canvas = document.createElement('canvas');
+                this.temp_canvas.width = Playground.width;
+                this.temp_canvas.height = Playground.height;
+
+                var temp_ctx = this.temp_canvas.getContext('2d');
+                temp_ctx.lineWidth = this.properties.lineWidth;
 
                 for (var key in this.scheme) {
                     key = parseInt(key);
@@ -342,8 +354,8 @@
                     if( typeof(this.scheme[key+1]) == 'undefined') break;
 
                     // draw a sector
-                    Circles.ctx.beginPath();
-                    Circles.ctx.arc(
+                    temp_ctx.beginPath();
+                    temp_ctx.arc(
                         Playground.center_x,
                         Playground.center_y,
                         this.properties.radius,
@@ -353,17 +365,16 @@
                     );
                     
                     //stroke a sector
-                    Circles.ctx.strokeStyle = this.scheme[key]['rgb'];
-                    Circles.ctx.stroke();
-                    Circles.ctx.closePath();
+                    temp_ctx.strokeStyle = this.scheme[key]['rgb'];
+                    temp_ctx.stroke();
+                    temp_ctx.closePath();
                 }
                 return true;
             }
             Circle.prototype.init = function(){
-                
                 this.countColorScheme();
+                this.create();
                 this.draw();
-
             }
             
             
