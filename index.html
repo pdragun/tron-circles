@@ -101,6 +101,12 @@
                     Playground.height = window.innerHeight - (header_height + footer_height + 100); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Playground.width = window.innerWidth;
                     
+                    if ( Playground.height > Playground.width) {
+                        Playground.height = Playground.width;
+                    } else {
+                        Playground.width = Playground.height;
+                    }
+
                     //Create canvas element
                     Circles.init();
 
