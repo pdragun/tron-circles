@@ -74,6 +74,14 @@
             var Init = {
                 no_canvas_support: 'Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.',
                 init: function(){
+                    if(window.innerHeight === 0 || window.innerWidth === 0){
+                        setTimeout('Init.init()', 500);
+                        return false;
+                    }
+                    this._init();
+                    return true;
+                },
+                _init: function(){
                     var min_circles = 3; //minimumm circles
                     var max_circles = 10; //maximum circles
                     var min_line_width = 5; //minimum circle line width
@@ -101,7 +109,7 @@
                     Playground.height = window.innerHeight - (header_height + footer_height + 30); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Playground.width = window.innerWidth;
                     
-                    if ( Playground.height > Playground.width) {
+                    if (Playground.height > Playground.width) {
                         Playground.height = Playground.width;
                     } else {
                         Playground.width = Playground.height;
