@@ -69,35 +69,6 @@
         <script type="text/javascript">
             //<![CDATA[
 
-            // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-            // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-            // requestAnimationFrame polyfill by Erik Möller
-            // fixes from Paul Irish and Tino Zijdel
-            (function() {
-                var lastTime = 0;
-                var vendors = ['ms', 'moz', 'webkit', 'o'];
-                for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-                    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-                    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
-                        || window[vendors[x]+'CancelRequestAnimationFrame'];
-                }
- 
-                if (!window.requestAnimationFrame)
-                    window.requestAnimationFrame = function(callback, element) {
-                        var currTime = new Date().getTime();
-                        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-                        var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-                        timeToCall);
-                        lastTime = currTime + timeToCall;
-                        return id;
-                    };
- 
-                if (!window.cancelAnimationFrame)
-                    window.cancelAnimationFrame = function(id) {
-                        clearTimeout(id);
-                    };
-            }());
-            
             //Main init object
             //Run at the begining
             var Init = {
@@ -127,7 +98,7 @@
                     var footer_height = document.getElementById('footer').offsetHeight;
 
                     //Set canvas size
-                    Playground.height = window.innerHeight - (header_height + footer_height + 50); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
+                    Playground.height = window.innerHeight - (header_height + footer_height + 60); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Playground.width = window.innerWidth;
 
                     //Create canvas element
@@ -213,7 +184,7 @@
                 this.lineWidth = 1;  //int, in pixels, at least 1px
                 this.rotation = 1; //int, in degrees, if negative move counterclockwise, default = 1;
                 this.rotateToAngle = 0; //int, in next draw circle, rotate to this angle, default = 0;
-                this.counterclockwise = false; //boolean, false is default (oposit of normal clockwise direction:)
+                this.counterclockwise = false; //boolean, false is default (oposit of normal clockwise direction)
                 this.colorScheme = []; //array, color scheme in RGB values, separated by comma
             }
             
