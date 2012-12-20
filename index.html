@@ -73,6 +73,7 @@
             //Run at the begining
             var Init = {
                 no_canvas_support: 'Your browser doesn\'t support canvas element. Please choose one of the newest version of modern browsers: Firefox, Chrome or Opera.',
+                //Wait when innerHeight returns 0 (when open page from Facebook in Chrome)
                 init: function(){
                     if(window.innerHeight === 0 || window.innerWidth === 0){
                         setTimeout('Init.init()', 150);
