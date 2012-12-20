@@ -98,7 +98,7 @@
                     var footer_height = document.getElementById('footer').offsetHeight;
 
                     //Set canvas size
-                    Playground.height = window.innerHeight - (header_height + footer_height + 100); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
+                    Playground.height = window.innerHeight - (header_height + footer_height + 30); //+random value, because window.innerHeight always returns bigger value in FF dunno why?
                     Playground.width = window.innerWidth;
                     
                     if ( Playground.height > Playground.width) {
@@ -111,6 +111,7 @@
                     Circles.init();
 
                     Playground.max_radius = Playground.width >= Playground.height ? Playground.height/2 : Playground.width/2;
+                    Playground.max_radius -= 10;
                     Playground.center_x = Math.round(Playground.width / 2);
                     Playground.center_y = Math.round(Playground.height / 2);
 
