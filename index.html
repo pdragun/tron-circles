@@ -158,7 +158,7 @@
 
                         //We have enough data, create new circle
                         var NewCircle = new Circle(temp_properties);
-                        Circles.addCircle(NewCircle)                        
+                        Circles.addCircle(NewCircle);
                     }
 
                     //Init all circles
@@ -177,7 +177,7 @@
                     Statistics.init(html_fps);
                     Statistics.start();
                 }
-            }
+            };
 
 
             //Obj hold basic properties for canvas (not canvas itself)
@@ -186,8 +186,8 @@
                 center_y: 0,
                 width: 0, // playground width [int] px
                 height: 0, // playground height [int] px
-                max_radius: 0, //maximal radius for the biggest circle [int] px
-            }
+                max_radius: 0 //maximal radius for the biggest circle [int] px
+            };
 
 
             //Contstructor of Properties object
@@ -233,14 +233,14 @@
                 }
 
                 return true;
-            }
+            };
             Circle.prototype.animate = function(){
                 this.rotate();
-            }
+            };
             Circle.prototype.setColorScheme = function(scheme){
                 this.scheme = scheme;
                 return true;
-            }
+            };
             //method to set color for each piece
             //this method run only once for each circe
             //TODO rename it and split it!!
@@ -336,18 +336,18 @@
                 
                 this.setColorScheme(color_scheme);
                 return true;
-            }
+            };
             Circle.prototype.countColorRatioAndDirection = function(begin_color, end_color, degrees){
                 
                 var ratio = Math.abs(begin_color - end_color) / degrees;
                 return begin_color >= end_color ? ratio * -1 : ratio;
                 
-            }
+            };
             //Method for drawing circle
             Circle.prototype.draw = function() {
                 Circles.ctx.drawImage(this.temp_canvas, 0, 0);
                 return true;
-            }
+            };
             //Method for creating circle
             Circle.prototype.create = function() {
                 
@@ -361,7 +361,7 @@
                 for (var key in this.scheme) {
                     key = parseInt(key);
             
-                    if( typeof(this.scheme[key+1]) == 'undefined') break;
+                    if( typeof(this.scheme[key+1]) === 'undefined') break;
 
                     // draw a sector
                     temp_ctx.beginPath();
@@ -380,12 +380,12 @@
                     temp_ctx.closePath();
                 }
                 return true;
-            }
+            };
             Circle.prototype.init = function(){
                 this.countColorScheme();
                 this.create();
                 this.draw();
-            }
+            };
             
             
             //Circle object
@@ -464,7 +464,7 @@
                         this.circles_collection[key].animate();
                     }  
                 }
-            }
+            };
             
             
             //Statistics
@@ -491,7 +491,7 @@
                 stop: function() {
                      clearInterval(this.timeout_id);
                 }
-            }
+            };
             
             
             var Animation = {
@@ -535,7 +535,7 @@
                     //by: http://paulirish.com/2011/requestanimationframe-for-smart-animating/
                     (function animloop(){
                         Animation.frame_count++;
-                        Animation.animate()
+                        Animation.animate();
                         this.animation_id = window.requestAnimationFrame(animloop);
                     })();
                 },
@@ -550,7 +550,7 @@
                         this.objects_to_animate[key].animate();
                     }
                 }
-            }
+            };
             
             
             //Init everything a start
